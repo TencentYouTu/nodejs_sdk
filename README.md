@@ -51,13 +51,10 @@ npm install tencentyoutuyun
     - `userid` 业务中的用户标识
 - 返回值 签名（base64）
 
-#### `exports.AUTH_PARAMS_ERROR`
+#### 其它
 
-参数错误常量（-1）
-
-#### `exports.AUTH_SECRET_ID_KEY_ERROR`
-
-密钥ID或者密钥KEY错误常量（-2）
+- `auth.AUTH_PARAMS_ERROR` 参数错误常量（-1）
+- `auth.AUTH_SECRET_ID_KEY_ERROR` 密钥ID或者密钥KEY错误常量（-2）
 
 ### `youtu`
 
