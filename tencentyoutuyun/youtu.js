@@ -116,7 +116,7 @@ exports.detectface = function(imagePath, callback) {
 /**
  *  人脸比对
  */
-exports.facecompare = function(image_a, image_b) {
+exports.facecompare = function(image_a, image_b, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
@@ -195,9 +195,9 @@ exports.facecompare = function(image_a, image_b) {
 
 
 /**
- *  人脸比对
+ *  人脸验证
  */
-exports.faceverify = function(image_a, person_id) {
+exports.faceverify = function(image_a, person_id, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
@@ -275,7 +275,7 @@ exports.faceverify = function(image_a, person_id) {
 /**
  *  FaceIdentify
  */
-exports.faceidentify= function(image_a, group_id) {
+exports.faceidentify= function(image_a, group_id, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
@@ -353,7 +353,7 @@ exports.faceidentify= function(image_a, group_id) {
 /**
  *  newperson
  */
-exports.newperson= function(image_a, person_id, group_ids) {
+exports.newperson= function(image_a, person_id, group_ids, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
@@ -433,7 +433,7 @@ exports.newperson= function(image_a, person_id, group_ids) {
 /**
  *  delperson
  */
-exports.delperson= function(person_id) {
+exports.delperson= function(person_id, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
@@ -500,7 +500,7 @@ exports.delperson= function(person_id) {
 /**
  * addface
  */
-exports.delface = function(person_id, face_ids) {
+exports.delface = function(person_id, face_ids, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
@@ -567,7 +567,7 @@ exports.delface = function(person_id, face_ids) {
 /**
  *  setinfo
  */
-exports.setinfo = function(person_name, person_id) {
+exports.setinfo = function(person_name, person_id, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
@@ -637,7 +637,7 @@ exports.setinfo = function(person_name, person_id) {
 /**
  *  getinfo
  */
-exports.getinfo = function(person_id) {
+exports.getinfo = function(person_id, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
@@ -704,7 +704,7 @@ exports.getinfo = function(person_id) {
 /**
  *  getgroupids
  */
-exports.getgroupids = function() {
+exports.getgroupids = function(callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
@@ -770,7 +770,7 @@ exports.getgroupids = function() {
 /**
  *  getpersonIds
  */
-exports.getpersonIds = function(group_id) {
+exports.getpersonIds = function(group_id, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
@@ -838,7 +838,7 @@ exports.getpersonIds = function(group_id) {
 /**
  *  getfaceIds
  */
-exports.getfaceIds = function(person_id) {
+exports.getfaceIds = function(person_id, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
@@ -906,7 +906,7 @@ exports.getfaceIds = function(person_id) {
 /**
  *  getfaceIds
  */
-exports.getfaceinfo = function(face_id) {
+exports.getfaceinfo = function(face_id, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
