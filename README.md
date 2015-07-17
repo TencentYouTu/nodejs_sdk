@@ -126,6 +126,146 @@ npm install tencentyoutuyun
 - `message` 状态码对应的描述文字
 - `data` 数据对象，参考API文档
 
+#### `youtu.newperson(image_a, person_id, group_ids, callback)`
+
+个体创建，创建一个Person，并将Person放置到group_ids指定的组当中。
+
+- 参数
+	- `image_a` 图片路径
+	- `person_id` 个体Person
+	- `group_ids` 要加入的组的列表（数组）
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
+#### `youtu.delperson(person_id, callback)`
+
+删除一个Person
+
+- 参数
+	- `person_id` 个体Person
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
+#### `youtu.delface(person_id, face_ids, callback)`
+
+删除人脸，删除一个person下的face，包括特征，属性和face_id。
+
+- 参数
+	- `person_id` 个体Person
+	- `face_ids` 要删除的faceId列表（数组）
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
+#### `youtu.setinfo(person_name, person_id, callback)`
+
+设置Person的name
+
+- 参数
+	- `person_name` 个体Person的name
+	- `person_id` 个体Person
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
+#### `youtu.getinfo(person_id, callback)`
+
+获取一个Person的信息，包括name、id、tag、相关的face以及groups等信息。
+
+- 参数
+	- `person_id` 个体Person
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
+#### `youtu.getgroupids(callback)`
+
+获取一个AppId下所有group列表
+
+- 参数
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
+#### `youtu.getpersonIds(group_id, callback)`
+
+获取一个组Group中所有person列表
+
+- 参数
+	- `group_id` 组
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
+
+#### `youtu.getfaceIds(person_id, callback)`
+
+获取一个组person中所有face列表
+
+- 参数
+	- `person_id` Person
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
+### `youtu.getfaceinfo(face_id, callback)`
+
+获取一个face的相关特征信息
+
+- 参数
+	- `face_id` Face
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
+> 注：SDK中没有增加人脸的API
 
 ## 动态指定您的配置
 ```javascript
