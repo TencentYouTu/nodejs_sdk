@@ -267,23 +267,5 @@ npm install tencentyoutuyun
 
 > 注：SDK中没有增加人脸的API
 
-## 动态指定您的配置
-```javascript
-tencentyun.conf.setAppInfo('200674', 'AKID6iy7TYQpLA4AmoGtNVlfZij00wy6qEuI', 'LtkKOTyAV0g4i4UscFXDYEGUIlxZrtnL', '123456');
-```
-
-## 人脸检测demo
-```javascript
-var tencentyoutuyun = require('..');
-var conf  = tencentyoutuyun.conf;
-var youtu = tencentyoutuyun.youtu;
-
-// 开发者　和应用信息
-conf.setAppInfo('xxxx', 'xxx', 'xxxx', 'xxx');
-
-
-// 人脸检测
-youtu.detectface('a.jpg', function(data){
-    console.log("detectface:" + JSON.stringify(data));
-});
-```
+## 致谢
+20150717 感谢[TooBug](https://github.com/TooBug) 提出的接口说明文档 和 bug 修复
