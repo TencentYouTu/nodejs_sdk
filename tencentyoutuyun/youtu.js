@@ -142,7 +142,7 @@ exports.facecompare = function(image_a, image_b, callback) {
         var params = {
             hostname: conf.API_YOUTU_SERVER,
             port: conf.API_YOUTU_PORT,
-            path: '/youtu/api/facecompare,
+            path: '/youtu/api/facecompare',
             method: 'POST',
             headers: {
                 'Authorization': sign,
@@ -222,7 +222,7 @@ exports.faceverify = function(image_a, person_id, callback) {
         var params = {
             hostname: conf.API_YOUTU_SERVER,
             port: conf.API_YOUTU_PORT,
-            path: '/youtu/api/faceverify,
+            path: '/youtu/api/faceverify',
             method: 'POST',
             headers: {
                 'Authorization': sign,
@@ -300,7 +300,7 @@ exports.faceidentify= function(image_a, group_id, callback) {
         var params = {
             hostname: conf.API_YOUTU_SERVER,
             port: conf.API_YOUTU_PORT,
-            path: '/youtu/api/faceidentify,
+            path: '/youtu/api/faceidentify',
             method: 'POST',
             headers: {
                 'Authorization': sign,
@@ -379,7 +379,7 @@ exports.newperson= function(image_a, person_id, group_ids, callback) {
         var params = {
             hostname: conf.API_YOUTU_SERVER,
             port: conf.API_YOUTU_PORT,
-            path: '/youtu/api/newperson,
+            path: '/youtu/api/newperson',
             method: 'POST',
             headers: {
                 'Authorization': sign,
@@ -448,7 +448,7 @@ exports.delperson= function(person_id, callback) {
     var params = {
         hostname: conf.API_YOUTU_SERVER,
         port: conf.API_YOUTU_PORT,
-        path: '/youtu/api/delperson,
+        path: '/youtu/api/delperson',
         method: 'POST',
         headers: {
             'Authorization': sign,
@@ -584,7 +584,7 @@ exports.setinfo = function(person_name, person_id, callback) {
     var params = {
         hostname: conf.API_YOUTU_SERVER,
         port: conf.API_YOUTU_PORT,
-        path: '/youtu/api/setinfo,
+        path: '/youtu/api/setinfo',
         method: 'POST',
         headers: {
             'Authorization': sign,
@@ -653,7 +653,7 @@ exports.getinfo = function(person_id, callback) {
     var params = {
         hostname: conf.API_YOUTU_SERVER,
         port: conf.API_YOUTU_PORT,
-        path: '/youtu/api/getinfo,
+        path: '/youtu/api/getinfo',
         method: 'POST',
         headers: {
             'Authorization': sign,
@@ -719,7 +719,7 @@ exports.getgroupids = function(callback) {
     var params = {
         hostname: conf.API_YOUTU_SERVER,
         port: conf.API_YOUTU_PORT,
-        path: '/youtu/api/getgroupids,
+        path: '/youtu/api/getgroupids',
         method: 'POST',
         headers: {
             'Authorization': sign,
@@ -770,7 +770,7 @@ exports.getgroupids = function(callback) {
 /**
  *  getpersonIds
  */
-exports.getpersonIds = function(group_id, callback) {
+exports.getpersonids = function(group_id, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
@@ -786,7 +786,7 @@ exports.getpersonIds = function(group_id, callback) {
     var params = {
         hostname: conf.API_YOUTU_SERVER,
         port: conf.API_YOUTU_PORT,
-        path: '/youtu/api/getpersonids,
+        path: '/youtu/api/getpersonids',
         method: 'POST',
         headers: {
             'Authorization': sign,
@@ -838,7 +838,7 @@ exports.getpersonIds = function(group_id, callback) {
 /**
  *  getfaceIds
  */
-exports.getfaceIds = function(person_id, callback) {
+exports.getfaceids = function(person_id, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
@@ -854,7 +854,7 @@ exports.getfaceIds = function(person_id, callback) {
     var params = {
         hostname: conf.API_YOUTU_SERVER,
         port: conf.API_YOUTU_PORT,
-        path: '/youtu/api/getfaceids,
+        path: '/youtu/api/getfaceids',
         method: 'POST',
         headers: {
             'Authorization': sign,
@@ -922,7 +922,7 @@ exports.getfaceinfo = function(face_id, callback) {
     var params = {
         hostname: conf.API_YOUTU_SERVER,
         port: conf.API_YOUTU_PORT,
-        path: '/youtu/api/getfaceinfo,
+        path: '/youtu/api/getfaceinfo',
         method: 'POST',
         headers: {
             'Authorization': sign,
