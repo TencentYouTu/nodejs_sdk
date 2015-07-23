@@ -208,8 +208,8 @@ exports.faceverify = function(image_a, person_id, callback) {
     fs.readFile(image_a, function (err_a, data_a){
 
          // 文件　读取　异常
-        if(err_a || err_b) {
-            callback({'httpcode':0, 'code':-1, 'message': image_a + ":" + err_a.message +"," + image_b +":"+ err_b.message, 'data':{}});
+        if(err_a ) {
+            callback({'httpcode':0, 'code':-1, 'message': image_a + ":" + err_a.message, 'data':{}});
             return;
         };
 
@@ -286,8 +286,8 @@ exports.faceidentify= function(image_a, group_id, callback) {
     fs.readFile(image_a, function (err_a, data_a){
 
          // 文件　读取　异常
-        if(err_a || err_b) {
-            callback({'httpcode':0, 'code':-1, 'message': image_a + ":" + err_a.message +"," + image_b +":"+ err_b.message, 'data':{}});
+        if(err_a) {
+            callback({'httpcode':0, 'code':-1, 'message': image_a + ":" + err_a.message, 'data':{}});
             return;
         };
 
@@ -364,8 +364,8 @@ exports.newperson= function(image_a, person_id, group_ids, callback) {
     fs.readFile(image_a, function (err_a, data_a){
 
          // 文件　读取　异常
-        if(err_a || err_b) {
-            callback({'httpcode':0, 'code':-1, 'message': image_a + ":" + err_a.message +"," + image_b +":"+ err_b.message, 'data':{}});
+        if(err_a) {
+            callback({'httpcode':0, 'code':-1, 'message': image_a + ":" + err_a.message, 'data':{}});
             return;
         };
 
@@ -538,9 +538,10 @@ exports.delface = function(person_id, face_ids, callback) {
         }
 
         var body = '';
-             response.setEncoding('utf8');
         
-             response.on('data', function (chunk) {
+        response.setEncoding('utf8');
+        
+        response.on('data', function (chunk) {
              body += chunk;
         });
 
@@ -606,9 +607,9 @@ exports.setinfo = function(person_name, person_id, callback) {
         }
 
         var body = '';
-             response.setEncoding('utf8');
+        response.setEncoding('utf8');
         
-             response.on('data', function (chunk) {
+        response.on('data', function (chunk) {
              body += chunk;
         });
 
@@ -675,9 +676,9 @@ exports.getinfo = function(person_id, callback) {
         }
 
         var body = '';
-             response.setEncoding('utf8');
+        response.setEncoding('utf8');
         
-             response.on('data', function (chunk) {
+        response.on('data', function (chunk) {
              body += chunk;
         });
 
@@ -741,9 +742,10 @@ exports.getgroupids = function(callback) {
         }
 
         var body = '';
-             response.setEncoding('utf8');
         
-             response.on('data', function (chunk) {
+        response.setEncoding('utf8');
+        
+        response.on('data', function (chunk) {
              body += chunk;
         });
 
@@ -808,9 +810,10 @@ exports.getpersonids = function(group_id, callback) {
         }
 
         var body = '';
-             response.setEncoding('utf8');
         
-             response.on('data', function (chunk) {
+        response.setEncoding('utf8');
+        
+        response.on('data', function (chunk) {
              body += chunk;
         });
 
@@ -876,9 +879,9 @@ exports.getfaceids = function(person_id, callback) {
         }
 
         var body = '';
-             response.setEncoding('utf8');
+        response.setEncoding('utf8');
         
-             response.on('data', function (chunk) {
+        response.on('data', function (chunk) {
              body += chunk;
         });
 
@@ -944,9 +947,9 @@ exports.getfaceinfo = function(face_id, callback) {
         }
 
         var body = '';
-             response.setEncoding('utf8');
+        response.setEncoding('utf8');
         
-             response.on('data', function (chunk) {
+        response.on('data', function (chunk) {
              body += chunk;
         });
 
