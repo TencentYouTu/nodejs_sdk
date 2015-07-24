@@ -14,8 +14,8 @@ var ua = function() {
 }
 
 exports.USER_AGENT = ua;
-exports.API_YOUTU_SERVER= '101.226.76.164';
-exports.API_YOUTU_PORT= 18082;
+exports.API_YOUTU_SERVER= 'api.youtu.qq.com';
+exports.API_YOUTU_PORT= 80;
 
 exports.setAppInfo = function(appid, secretId, secretKey, userid) {
     module.exports.APPID = appid;

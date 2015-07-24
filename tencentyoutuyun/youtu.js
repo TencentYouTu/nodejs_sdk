@@ -152,6 +152,7 @@ exports.facecompare = function(image_a, image_b, callback) {
             }                
         };
         
+        console.log(request_body);
 
         var request = http.request(params, function(response) {
         
