@@ -19,4 +19,6 @@ youtu.detectface('a.jpg', function(data){
 
 // 其他函数调用 类似
 
-
+//youtu.addface('111', ['a.jpg','a.jpg'], function(data){
+//    console.log("addface:" + JSON.stringify(data));
+//});

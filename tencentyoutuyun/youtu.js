@@ -498,7 +498,95 @@ exports.delperson= function(person_id, callback) {
 
 
 /**
- * addface
+ * addface 
+ *   person_id : the persion of the face to be added
+ *   iamges   :  image files array to be added
+ */
+ exports.addface = function(person_id, images, callback) {
+
+    callback = callback || function(ret){console.log(ret)};
+
+    var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
+    var sign  = auth.appSign(expired);
+    
+    var image_bufs = new Array();
+    
+    for( var idx in images)
+    {
+        var data =fs.readFileSync(images[idx]);
+        
+        if(!data) {
+            callback({'httpcode':0, 'code':-1, 'message': images[idx] + ": read failed!", 'data':{}});
+            return;    
+        }
+
+       image_bufs[idx] = data.toString('base64');
+    }  
+    
+    
+    var request_body = JSON.stringify({
+        app_id: conf.APPID,
+        images : image_bufs,
+        person_id : person_id,
+    });
+    
+    console.log(request_body);
+
+    var params = {
+        hostname: conf.API_YOUTU_SERVER,
+        port: conf.API_YOUTU_PORT,
+        path: '/youtu/api/newperson',
+        method: 'POST',
+        headers: {
+        'Authorization': sign,
+        'User-Agent'   : conf.USER_AGENT(),
+        'Content-Length': request_body.length,
+        'Content-Type': 'text/json'
+        }                
+    };
+
+
+    var request = http.request(params, function(response) {
+
+        // console.log('STATUS: ' + response.statusCode);
+        // console.log('HEADERS: ' + JSON.stringify(response.headers));
+
+        if( response.statusCode  !=  200 ){
+        callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
+        return;
+        }
+
+        var body = '';
+        response.setEncoding('utf8');
+        
+        response.on('data', function (chunk) {
+        body += chunk;
+        });
+
+        response.on('end', function(){
+        callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
+        });
+
+        response.on('error', function(e){
+        callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
+        });
+
+    }); // 
+
+     
+    request.on('error', function(e) {
+         callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
+    });
+
+    // send the request body
+    request.end(request_body);
+
+
+}
+
+ 
+ /**
+ * delface
  */
 exports.delface = function(person_id, face_ids, callback) {
 
