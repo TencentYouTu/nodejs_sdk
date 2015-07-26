@@ -536,7 +536,7 @@ exports.delperson= function(person_id, callback) {
     var params = {
         hostname: conf.API_YOUTU_SERVER,
         port: conf.API_YOUTU_PORT,
-        path: '/youtu/api/newperson',
+        path: '/youtu/api/addface',
         method: 'POST',
         headers: {
         'Authorization': sign,
