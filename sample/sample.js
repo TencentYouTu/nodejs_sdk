@@ -25,5 +25,5 @@ conf.setAppInfo(appid, secretId, secretKey, userid)
 //TencentYouTu});
 
 youtu.facecompare('a.jpg', 'a.jpg', function(data){
-    console.log("detectface:" + JSON.stringify(data));
+    console.log("facecompare:" + JSON.stringify(data));
 });
