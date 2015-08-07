@@ -1,11 +1,11 @@
-# tencentyun-image-node
+# tencentyun-youtu-nodejs-sdk
 
-nodejs sdk for [腾讯云智能优图服务](http://www.qcloud.com/product/youtu.html)
+nodejs sdk for [腾讯优图开放平台](http://open.youtu.qq.com/)
 
 ## 安装
 
 ```sh
-npm install tencentyoutuyun
+git clone https://github.com/TencentYouTu/nodejs_sdk.git
 ```
 
 ## 名词
