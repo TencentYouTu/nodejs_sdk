@@ -27,7 +27,7 @@ exports.appSign = function(expired, userid) {
     var rdm            = parseInt(Math.random() * Math.pow(2, 32));
     
     // the order of every key is not matter verify
-    var plainText = 'a=' + appid + '&k=' + secretId + '&e=' + expired + '&t=' + now + '&r=' + rdm + '&u=' + userid;
+    var plainText = 'a=' + appid + '&k=' + secretId + '&e=' + pexpired + '&t=' + now + '&r=' + rdm + '&u=' + puserid;
         
     var data = new Buffer(plainText,'utf8');
     
