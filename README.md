@@ -21,7 +21,7 @@ git clone https://github.com/TencentYouTu/nodejs_sdk.git
 
 配置项相关
 
-#### `conf.setAppInfo(appid, secretId, secretKey, userid)`
+#### `conf.setAppInfo(appid, secretId, secretKey, userid, domain)`
 
 初始化配置项
 
@@ -30,6 +30,7 @@ git clone https://github.com/TencentYouTu/nodejs_sdk.git
 	- `secretId` SecretId 字符串类型
 	- `secretKey` SecretKey 字符串类型
 	- `userid` 业务中的用户标识 字符串类型
+	- `domain` 主机标识，0（优图服务），1（腾讯云）
 - 返回值 无（`undefined`）
 
 #### 其它

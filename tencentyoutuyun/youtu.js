@@ -1,5 +1,7 @@
 var http = require('http');
+var https = require('https');
 var fs = require('fs');
+var conv = require('iconv-lite')
 
 
 var auth = require('./auth');
@@ -35,10 +37,37 @@ function statusText(status) {
     return statusText;
 };
 
+function  getrequest(protocol, params, callback) {
+
+    return protocol.request(params, function(response) {
+    
+        // console.log('STATUS: ' + response.statusCode);
+        // console.log('HEADERS: ' + JSON.stringify(response.headers));
+
+        if( response.statusCode  !=  200 ){
+            callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
+            return;
+        }
+
+        var body = '';
+        response.setEncoding('utf8');
+        
+        response.on('data', function (chunk) {
+            body += chunk;
+        });
+        response.on('end', function(){
+            callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
+        });
+
+        response.on('error', function(e){
+            callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
+        });
+    }); // 
+};
 
 /**
  * @brief detectface
- * @param imagePath 待检测的路径
+ * @param imagePath 待检测的路径（本地路径或url）
  * @param isbigface 是否大脸模式 ０表示检测所有人脸， 1表示只检测照片最大人脸　适合单人照模式
  * @param callback 回调函数, 参见Readme 文档
  */
@@ -48,77 +77,67 @@ exports.detectface = function(imagePath,　isbigface, callback) {
 
     var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
     var sign  = auth.appSign(expired);
-    
-
-    fs.readFile(imagePath, function (err, data){
-
-        if(err) {
+    var tag = imagePath.substring(0,4);
+    var request_body = '';
+    if (tag == 'http')
+    {
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            url : imagePath,
+            mode  : isbigface,
+        });
+    }
+    else
+    {
+        var data = fs.readFileSync(imagePath).toString('base64');
+        
+        if(data == null) {
             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
             return;
         };
 
-        var request_body = JSON.stringify({
+        request_body = JSON.stringify({
             app_id: conf.APPID,
             image : data.toString('base64'),
             mode  : isbigface,
         });
-
-        var params = {
-            hostname: conf.API_YOUTU_SERVER,
-            port: conf.API_YOUTU_PORT,
-            path: '/youtu/api/detectface',
-            method: 'POST',
-            headers: {
-                'Authorization': sign,
-                'User-Agent'   : conf.USER_AGENT(),
-                'Content-Length': request_body.length,
-                'Content-Type': 'text/json'
-            }                
-        };
-        
-
-        var request = http.request(params, function(response) {
-        
-            // console.log('STATUS: ' + response.statusCode);
-            // console.log('HEADERS: ' + JSON.stringify(response.headers));
-
-            if( response.statusCode  !=  200 ){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
-                return;
-            }
-
-            var body = '';
-            response.setEncoding('utf8');
-            
-            response.on('data', function (chunk) {
-                body += chunk;
-            });
-
-            response.on('end', function(){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
-            });
-
-            response.on('error', function(e){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
-            });
-
-        }); // 
-       
-         
-        request.on('error', function(e) {
-             callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
-        });
-
-        // send the request body
-        request.end(request_body);
-        
-    }); //  fs.readFile(
+    }
+    var params = {
+        hostname: conf.API_YOUTU_SERVER,
+        path: '/youtu/api/detectface',
+        method: 'POST',
+        headers: {
+            'Authorization': sign,
+            'User-Agent'   : conf.USER_AGENT(),
+            'Content-Length': request_body.length,
+            'Content-Type': 'text/json'
+        }
+    };
+    
+    //console.log(request_body);
+    //console.log(params);
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    }
+    
+    request.on('error', function(e) {
+        callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
+    });
+    
+    // send the request body
+    request.end(request_body);    
+    //console.log(request_body);
 }
 
 
 /**
  * @brief faceshape
- * @param imagePath 待检测的路径
+ * @param imagePath 待检测的路径（本地路径或url）
  * @param isbigface 是否大脸模式
  * @param callback 回调函数, 参见Readme 文档
  */
@@ -128,78 +147,65 @@ exports.faceshape = function(imagePath, isbigface, callback) {
 
     var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
     var sign  = auth.appSign(expired);
-    
-
-    fs.readFile(imagePath, function (err, data){
-
-        if(err) {
+    var tag = imagePath.substring(0,4);
+    var request_body = '';
+    if (tag == 'http')
+    {
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            url : imagePath,
+            mode  : isbigface,
+        });
+    }
+    else
+    {
+        var data = fs.readFileSync(imagePath).toString('base64');
+        
+        if(data == null) {
             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
             return;
         };
 
-        var request_body = JSON.stringify({
+        request_body = JSON.stringify({
             app_id: conf.APPID,
             image : data.toString('base64'),
             mode  : isbigface,
         });
-
-        var params = {
-            hostname: conf.API_YOUTU_SERVER,
-            port: conf.API_YOUTU_PORT,
-            path: '/youtu/api/faceshape',
-            method: 'POST',
-            headers: {
-                'Authorization': sign,
-                'User-Agent'   : conf.USER_AGENT(),
-                'Content-Length': request_body.length,
-                'Content-Type': 'text/json'
-            }                
-        };
+    }
+    var params = {
+        hostname: conf.API_YOUTU_SERVER,
+        path: '/youtu/api/faceshape',
+        method: 'POST',
+        headers: {
+            'Authorization': sign,
+            'User-Agent'   : conf.USER_AGENT(),
+            'Content-Length': request_body.length,
+            'Content-Type': 'text/json'
+        }                
+    };
         
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    }
+    
+    request.on('error', function(e) {
+         callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
+    });
 
-        var request = http.request(params, function(response) {
-        
-            // console.log('STATUS: ' + response.statusCode);
-            // console.log('HEADERS: ' + JSON.stringify(response.headers));
-
-            if( response.statusCode  !=  200 ){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
-                return;
-            }
-
-            var body = '';
-            response.setEncoding('utf8');
-            
-            response.on('data', function (chunk) {
-                body += chunk;
-            });
-
-            response.on('end', function(){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
-            });
-
-            response.on('error', function(e){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
-            });
-
-        }); // 
-       
-         
-        request.on('error', function(e) {
-             callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
-        });
-
-        // send the request body
-        request.end(request_body);
-        
-    }); //  fs.readFile(
+    // send the request body
+    request.end(request_body);
 }
 
 
 /**
  * @brief facecompare
- * @param image_a 待比对的A图片路径
- * @param image_b 待比对的B图片路径
+ * @param image_a 待比对的A图片路径（本地路径或url）
+ * @param image_b 待比对的B图片路径（本地路径或url）
  * @param callback 回调函数, 参见Readme 文档
  */
 exports.facecompare = function(image_a, image_b, callback) {
@@ -208,14 +214,23 @@ exports.facecompare = function(image_a, image_b, callback) {
 
     var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
     var sign  = auth.appSign(expired);
-    
-
-    fs.readFile(image_a, function (err_a, data_a){
-    fs.readFile(image_b, function (err_b, data_b){
-
-         // 文件　读取　异常
-        if(err_a || err_b) {
-            callback({'httpcode':0, 'code':-1, 'message': image_a + ":" + err_a.message +"," + image_b +":"+ err_b.message, 'data':{}});
+    var tag = image_a.substring(0,4);
+    var request_body = '';
+    if (tag == 'http')
+    {
+        var request_body = JSON.stringify({
+            app_id: conf.APPID,
+            urlA : image_a,
+            urlB : image_b,
+        });
+    }
+    else
+    {
+        var data_a = fs.readFileSync(image_a).toString('base64');
+        var data_b = fs.readFileSync(image_b).toString('base64');
+        
+        if(data_a == null || data_b == null ) {
+            callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
             return;
         };
 
@@ -224,308 +239,258 @@ exports.facecompare = function(image_a, image_b, callback) {
             imageA : data_a.toString('base64'),
             imageB : data_b.toString('base64'),
         });
-
-        var params = {
-            hostname: conf.API_YOUTU_SERVER,
-            port: conf.API_YOUTU_PORT,
-            path: '/youtu/api/facecompare',
-            method: 'POST',
-            headers: {
-                'Authorization': sign,
-                'User-Agent'   : conf.USER_AGENT(),
-                'Content-Length': request_body.length,
-                'Content-Type': 'text/json'
-            }                
-        };
-        
-        console.log(request_body);
-
-        var request = http.request(params, function(response) {
-        
-            // console.log('STATUS: ' + response.statusCode);
-            // console.log('HEADERS: ' + JSON.stringify(response.headers));
-
-            if( response.statusCode  !=  200 ){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
-                return;
-            }
-
-            var body = '';
-            response.setEncoding('utf8');
-            
-            response.on('data', function (chunk) {
-                body += chunk;
-            });
-
-            response.on('end', function(){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
-            });
-
-            response.on('error', function(e){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
-            });
-
-        }); // 
+    }
+    
+    var params = {
+        hostname: conf.API_YOUTU_SERVER,
+        path: '/youtu/api/facecompare',
+        method: 'POST',
+        headers: {
+            'Authorization': sign,
+            'User-Agent'   : conf.USER_AGENT(),
+            'Content-Length': request_body.length,
+            'Content-Type': 'text/json'
+        }                
+    };
+     
+    //console.log(request_body);
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
        
-         
-        request.on('error', function(e) {
-             callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
-        });
+    request.on('error', function(e) {
+         callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
+    });
 
-        // send the request body
-        request.end(request_body);
-        
-    }); }); //  fs.readFile(
+    // send the request body
+    request.end(request_body);
 }
-
-
 
 
 /**
  * @brief faceverify
  * @param person_id 待验证的人脸id
- * @param image_a 待验证的图片路径
+ * @param imagePath 待验证的图片路径（本地路径或url）
  * @param callback 回调函数, 参见Readme 文档
  */
-exports.faceverify = function(image_a, person_id, callback) {
+exports.faceverify = function(imagePath, person_id, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
     var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
     var sign  = auth.appSign(expired);
+    var tag = imagePath.substring(0,4);
+    var request_body = '';
     
-
-    fs.readFile(image_a, function (err_a, data_a){
-
-         // 文件　读取　异常
-        if(err_a ) {
-            callback({'httpcode':0, 'code':-1, 'message': image_a + ":" + err_a.message, 'data':{}});
+    if (tag == 'http')
+    {
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            url : imagePath,
+            person_id : person_id,
+        });
+    }
+    else
+    {
+        var data = fs.readFileSync(imagePath).toString('base64');
+        
+        if(data == null) {
+            callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
             return;
         };
 
-        var request_body = JSON.stringify({
+        request_body = JSON.stringify({
             app_id: conf.APPID,
-            image : data_a.toString('base64'),
+            image : data.toString('base64'),
             person_id : person_id,
         });
-
-        var params = {
-            hostname: conf.API_YOUTU_SERVER,
-            port: conf.API_YOUTU_PORT,
-            path: '/youtu/api/faceverify',
-            method: 'POST',
-            headers: {
-                'Authorization': sign,
-                'User-Agent'   : conf.USER_AGENT(),
-                'Content-Length': request_body.length,
-                'Content-Type': 'text/json'
-            }                
-        };
+    }
+    
+    var params = {
+        hostname: conf.API_YOUTU_SERVER,
+        path: '/youtu/api/faceverify',
+        method: 'POST',
+        headers: {
+            'Authorization': sign,
+            'User-Agent'   : conf.USER_AGENT(),
+            'Content-Length': request_body.length,
+            'Content-Type': 'text/json'
+        }                
+    };
         
-
-        var request = http.request(params, function(response) {
-        
-            // console.log('STATUS: ' + response.statusCode);
-            // console.log('HEADERS: ' + JSON.stringify(response.headers));
-
-            if( response.statusCode  !=  200 ){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
-                return;
-            }
-
-            var body = '';
-            response.setEncoding('utf8');
-            
-            response.on('data', function (chunk) {
-                body += chunk;
-            });
-
-            response.on('end', function(){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
-            });
-
-            response.on('error', function(e){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
-            });
-
-        }); // 
+    //console.log(request_body);
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
        
-         
-        request.on('error', function(e) {
+
+    request.on('error', function(e) {
              callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
         });
 
-        // send the request body
-        request.end(request_body);
+    // send the request body
+    request.end(request_body);
         
-    });
 }
 
 
 /**
  * @brief faceidentify
  * @param group_id 识别的组id
- * @param image_a 待识别的图片路径
+ * @param imagePath 待识别的图片路径（本地路径或url）
  * @param callback 回调函数, 参见Readme 文档
  */
-exports.faceidentify= function(image_a, group_id, callback) {
+exports.faceidentify= function(imagePath, group_id, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
     var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
     var sign  = auth.appSign(expired);
+    var tag = imagePath.substring(0,4);
+    var request_body = '';
     
-
-    fs.readFile(image_a, function (err_a, data_a){
-
-         // 文件　读取　异常
-        if(err_a) {
-            callback({'httpcode':0, 'code':-1, 'message': image_a + ":" + err_a.message, 'data':{}});
+    if (tag == 'http')
+    {
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            url : imagePath,
+            group_id : group_id,
+        });
+    }
+    else
+    {
+        var data = fs.readFileSync(imagePath).toString('base64');
+        
+        if(data == null) {
+            callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
             return;
         };
 
-        var request_body = JSON.stringify({
+        request_body = JSON.stringify({
             app_id: conf.APPID,
-            image : data_a.toString('base64'),
+            image : data.toString('base64'),
             group_id : group_id,
         });
-
-        var params = {
-            hostname: conf.API_YOUTU_SERVER,
-            port: conf.API_YOUTU_PORT,
-            path: '/youtu/api/faceidentify',
-            method: 'POST',
-            headers: {
-                'Authorization': sign,
-                'User-Agent'   : conf.USER_AGENT(),
-                'Content-Length': request_body.length,
-                'Content-Type': 'text/json'
-            }                
-        };
+    }
+    
+    var params = {
+        hostname: conf.API_YOUTU_SERVER,
+        path: '/youtu/api/faceidentify',
+        method: 'POST',
+        headers: {
+            'Authorization': sign,
+            'User-Agent'   : conf.USER_AGENT(),
+            'Content-Length': request_body.length,
+            'Content-Type': 'text/json'
+        }                
+    };
         
-
-        var request = http.request(params, function(response) {
-        
-            // console.log('STATUS: ' + response.statusCode);
-            // console.log('HEADERS: ' + JSON.stringify(response.headers));
-
-            if( response.statusCode  !=  200 ){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
-                return;
-            }
-
-            var body = '';
-            response.setEncoding('utf8');
-            
-            response.on('data', function (chunk) {
-                body += chunk;
-            });
-
-            response.on('end', function(){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
-            });
-
-            response.on('error', function(e){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
-            });
-
-        }); // 
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
        
-         
-        request.on('error', function(e) {
-             callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
-        });
-
-        // send the request body
-        request.end(request_body);
-        
+    request.on('error', function(e) {
+         callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
     });
+
+    // send the request body
+    request.end(request_body);
 }
 
 /**
  * @brief newperson
+ * @param imagePath 图片路径（本地路径或url）
  * @param person_id 新建的个体id，用户指定，需要保证app_id下的唯一性
  * @param person_name 个体的名字
  * @param group_ids 新建的个体存放的组id，可以指定多个组id，用户指定（组默认创建）
- * @param imageData 包含个体人脸的图片数据
  * @param persontag 人备注信息，用户自解释字段
  * @param callback 回调函数, 参见Readme 文档
  */
-exports.newperson= function(image_a, person_id, person_name, group_ids, persontag, callback) {
+exports.newperson= function(imagePath, person_id, person_name, group_ids, persontag, callback) {
 
     callback = callback || function(ret){console.log(ret)};
 
     var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
     var sign  = auth.appSign(expired);
     
+    var tag = imagePath.substring(0,4);
+    var request_body = '';
 
-    fs.readFile(image_a, function (err_a, data_a){
-
-         // 文件　读取　异常
-        if(err_a) {
-            callback({'httpcode':0, 'code':-1, 'message': image_a + ":" + err_a.message, 'data':{}});
-            return;
-        };
-
-        var request_body = JSON.stringify({
+    if (tag == 'http')
+    {
+        request_body = JSON.stringify({
             app_id: conf.APPID,
-            image : data_a.toString('base64'),
+            url : imagePath,
             person_id : person_id,
             person_name: person_name,
             group_ids : group_ids,
             tag: persontag,
         });
-
-        var params = {
-            hostname: conf.API_YOUTU_SERVER,
-            port: conf.API_YOUTU_PORT,
-            path: '/youtu/api/newperson',
-            method: 'POST',
-            headers: {
-                'Authorization': sign,
-                'User-Agent'   : conf.USER_AGENT(),
-                'Content-Length': request_body.length,
-                'Content-Type': 'text/json'
-            }                
+    }
+    else
+    {
+        var data = fs.readFileSync(imagePath).toString('base64');
+        
+        if(data == null) {
+            callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
+            return;
         };
-        
 
-        var request = http.request(params, function(response) {
-        
-            // console.log('STATUS: ' + response.statusCode);
-            // console.log('HEADERS: ' + JSON.stringify(response.headers));
-
-            if( response.statusCode  !=  200 ){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
-                return;
-            }
-
-            var body = '';
-            response.setEncoding('utf8');
-            
-            response.on('data', function (chunk) {
-                body += chunk;
-            });
-
-            response.on('end', function(){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
-            });
-
-            response.on('error', function(e){
-                callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
-            });
-
-        }); // 
-       
-         
-        request.on('error', function(e) {
-             callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            image : data.toString('base64'),
+            person_id : person_id,
+            person_name: person_name,
+            group_ids : group_ids,
+            tag: persontag,
         });
+    }
+    
 
-        // send the request body
-        request.end(request_body);
-        
+    var buffer = new Buffer(request_body, "UTF-8");
+
+    var params = {
+        hostname: conf.API_YOUTU_SERVER,
+        path: '/youtu/api/newperson',
+        method: 'POST',
+        headers: {
+            'Authorization': sign,
+            'User-Agent'   : conf.USER_AGENT(),
+            'Content-Length': buffer.length,
+            'Content-Type': 'text/json'
+        }                
+    };
+
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
+    
+    request.on('error', function(e) {
+         callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
     });
+    
+    // send the request body
+    request.end(request_body);
 }
 
 
@@ -559,35 +524,15 @@ exports.delperson= function(person_id, callback) {
         }
     };
 
-
-    var request = http.request(params, function(response) {
-
-        // console.log('STATUS: ' + response.statusCode);
-        // console.log('HEADERS: ' + JSON.stringify(response.headers));
-
-        if( response.statusCode  !=  200 ){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
-             return;
-        }
-
-        var body = '';
-        response.setEncoding('utf8');
-        
-        response.on('data', function (chunk) {
-             body += chunk;
-        });
-
-        response.on('end', function(){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
-        });
-
-        response.on('error', function(e){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
-        });
-
-    }); // 
-
-     
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
+ 
     request.on('error', function(e) {
          callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
     });
@@ -612,79 +557,71 @@ exports.delperson= function(person_id, callback) {
     var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
     var sign  = auth.appSign(expired);
     
-    var image_bufs = new Array();
+    var tag = images[0].substring(0,4);
+    var request_body = '';
     
-    for( var idx in images)
+    if (tag == 'http')
     {
-        var data =fs.readFileSync(images[idx]);
-        
-        if(!data) {
-            callback({'httpcode':0, 'code':-1, 'message': images[idx] + ": read failed!", 'data':{}});
-            return;    
-        }
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            urls : images,
+            person_id : person_id,
+            tag : facetag
+        });
+    }
+    else
+    {
+        var image_bufs = new Array();
+    
+        for( var idx in images)
+        {
+            var data =fs.readFileSync(images[idx]);
+            if(!data) {
+                callback({'httpcode':0, 'code':-1, 'message': images[idx] + ": read failed!", 'data':{}});
+                return;    
+            }
 
-       image_bufs[idx] = data.toString('base64');
-    }  
+           image_bufs[idx] = data.toString('base64');
+        }  
     
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            images : image_bufs,
+            person_id : person_id,
+            tag : facetag
+        });
+    }
     
-    var request_body = JSON.stringify({
-        app_id: conf.APPID,
-        images : image_bufs,
-        person_id : person_id,
-        tag : facetag
-    });
-    
-    console.log(request_body);
-
+    //console.log(request_body);
+    var buffer = new Buffer(request_body, "UTF-8");
     var params = {
         hostname: conf.API_YOUTU_SERVER,
-        port: conf.API_YOUTU_PORT,
         path: '/youtu/api/addface',
         method: 'POST',
         headers: {
         'Authorization': sign,
         'User-Agent'   : conf.USER_AGENT(),
-        'Content-Length': request_body.length,
+        'Content-Length': buffer.length,
         'Content-Type': 'text/json'
         }                
     };
 
-
-    var request = http.request(params, function(response) {
-
-        // console.log('STATUS: ' + response.statusCode);
-        // console.log('HEADERS: ' + JSON.stringify(response.headers));
-
-        if( response.statusCode  !=  200 ){
-        callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
-        return;
-        }
-
-        var body = '';
-        response.setEncoding('utf8');
-        
-        response.on('data', function (chunk) {
-        body += chunk;
-        });
-
-        response.on('end', function(){
-        callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
-        });
-
-        response.on('error', function(e){
-        callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
-        });
-
-    }); // 
-
-     
+    //console.log(params);
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
+ 
     request.on('error', function(e) {
          callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
     });
 
     // send the request body
     request.end(request_body);
-
 
 }
 
@@ -710,7 +647,6 @@ exports.delface = function(person_id, face_ids, callback) {
 
     var params = {
         hostname: conf.API_YOUTU_SERVER,
-        port: conf.API_YOUTU_PORT,
         path: '/youtu/api/delface',
         method: 'POST',
         headers: {
@@ -721,35 +657,14 @@ exports.delface = function(person_id, face_ids, callback) {
         }
     };
 
-
-    var request = http.request(params, function(response) {
-
-        // console.log('STATUS: ' + response.statusCode);
-        // console.log('HEADERS: ' + JSON.stringify(response.headers));
-
-        if( response.statusCode  !=  200 ){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
-             return;
-        }
-
-        var body = '';
-        
-        response.setEncoding('utf8');
-        
-        response.on('data', function (chunk) {
-             body += chunk;
-        });
-
-        response.on('end', function(){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
-        });
-
-        response.on('error', function(e){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
-        });
-
-    }); // 
-
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    }
      
     request.on('error', function(e) {
          callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
@@ -774,7 +689,6 @@ exports.setinfo = function(person_name, person_id, tag, callback) {
     var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
     var sign  = auth.appSign(expired);
     
-    
     var request_body = JSON.stringify({
         app_id: conf.APPID,
         person_name: person_name,
@@ -782,48 +696,28 @@ exports.setinfo = function(person_name, person_id, tag, callback) {
         tag: tag,
     });
 
+    var buffer = new Buffer(request_body, "UTF-8");
     var params = {
         hostname: conf.API_YOUTU_SERVER,
-        port: conf.API_YOUTU_PORT,
         path: '/youtu/api/setinfo',
         method: 'POST',
         headers: {
             'Authorization': sign,
             'User-Agent'   : conf.USER_AGENT(),
-            'Content-Length': request_body.length,
+            'Content-Length': buffer.length,
             'Content-Type': 'text/json'
         }
     };
 
-
-    var request = http.request(params, function(response) {
-
-        // console.log('STATUS: ' + response.statusCode);
-        // console.log('HEADERS: ' + JSON.stringify(response.headers));
-
-        if( response.statusCode  !=  200 ){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
-             return;
-        }
-
-        var body = '';
-        response.setEncoding('utf8');
-        
-        response.on('data', function (chunk) {
-             body += chunk;
-        });
-
-        response.on('end', function(){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
-        });
-
-        response.on('error', function(e){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
-        });
-
-    }); // 
-
-     
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+       request = getrequest(http, params, callback);
+    } 
+    else {
+       request = getrequest(https, params, callback);
+    } 
+ 
     request.on('error', function(e) {
          callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
     });
@@ -855,7 +749,6 @@ exports.getinfo = function(person_id, callback) {
 
     var params = {
         hostname: conf.API_YOUTU_SERVER,
-        port: conf.API_YOUTU_PORT,
         path: '/youtu/api/getinfo',
         method: 'POST',
         headers: {
@@ -866,35 +759,15 @@ exports.getinfo = function(person_id, callback) {
         }
     };
 
-
-    var request = http.request(params, function(response) {
-
-        // console.log('STATUS: ' + response.statusCode);
-        // console.log('HEADERS: ' + JSON.stringify(response.headers));
-
-        if( response.statusCode  !=  200 ){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
-             return;
-        }
-
-        var body = '';
-        response.setEncoding('utf8');
-        
-        response.on('data', function (chunk) {
-             body += chunk;
-        });
-
-        response.on('end', function(){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
-        });
-
-        response.on('error', function(e){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
-        });
-
-    }); // 
-
-     
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
+ 
     request.on('error', function(e) {
          callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
     });
@@ -915,14 +788,12 @@ exports.getgroupids = function(callback) {
     var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
     var sign  = auth.appSign(expired);
     
-    
     var request_body = JSON.stringify({
         app_id: conf.APPID,
     });
 
     var params = {
         hostname: conf.API_YOUTU_SERVER,
-        port: conf.API_YOUTU_PORT,
         path: '/youtu/api/getgroupids',
         method: 'POST',
         headers: {
@@ -934,34 +805,14 @@ exports.getgroupids = function(callback) {
     };
 
 
-    var request = http.request(params, function(response) {
-
-        // console.log('STATUS: ' + response.statusCode);
-        // console.log('HEADERS: ' + JSON.stringify(response.headers));
-
-        if( response.statusCode  !=  200 ){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
-             return;
-        }
-
-        var body = '';
-        
-        response.setEncoding('utf8');
-        
-        response.on('data', function (chunk) {
-             body += chunk;
-        });
-
-        response.on('end', function(){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
-        });
-
-        response.on('error', function(e){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
-        });
-
-    }); // 
-
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    }
      
     request.on('error', function(e) {
          callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
@@ -1003,36 +854,15 @@ exports.getpersonids = function(group_id, callback) {
         }
     };
 
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
 
-    var request = http.request(params, function(response) {
-
-        // console.log('STATUS: ' + response.statusCode);
-        // console.log('HEADERS: ' + JSON.stringify(response.headers));
-
-        if( response.statusCode  !=  200 ){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
-             return;
-        }
-
-        var body = '';
-        
-        response.setEncoding('utf8');
-        
-        response.on('data', function (chunk) {
-             body += chunk;
-        });
-
-        response.on('end', function(){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
-        });
-
-        response.on('error', function(e){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
-        });
-
-    }); // 
-
-     
     request.on('error', function(e) {
          callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
     });
@@ -1064,7 +894,6 @@ exports.getfaceids = function(person_id, callback) {
 
     var params = {
         hostname: conf.API_YOUTU_SERVER,
-        port: conf.API_YOUTU_PORT,
         path: '/youtu/api/getfaceids',
         method: 'POST',
         headers: {
@@ -1075,35 +904,15 @@ exports.getfaceids = function(person_id, callback) {
         }
     };
 
-
-    var request = http.request(params, function(response) {
-
-        // console.log('STATUS: ' + response.statusCode);
-        // console.log('HEADERS: ' + JSON.stringify(response.headers));
-
-        if( response.statusCode  !=  200 ){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
-             return;
-        }
-
-        var body = '';
-        response.setEncoding('utf8');
-        
-        response.on('data', function (chunk) {
-             body += chunk;
-        });
-
-        response.on('end', function(){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
-        });
-
-        response.on('error', function(e){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
-        });
-
-    }); // 
-
-     
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    }  
+ 
     request.on('error', function(e) {
          callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
     });
@@ -1126,7 +935,6 @@ exports.getfaceinfo = function(face_id, callback) {
     var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
     var sign  = auth.appSign(expired);
     
-    
     var request_body = JSON.stringify({
         app_id: conf.APPID,
         face_id:face_id
@@ -1134,7 +942,6 @@ exports.getfaceinfo = function(face_id, callback) {
 
     var params = {
         hostname: conf.API_YOUTU_SERVER,
-        port: conf.API_YOUTU_PORT,
         path: '/youtu/api/getfaceinfo',
         method: 'POST',
         headers: {
@@ -1145,35 +952,15 @@ exports.getfaceinfo = function(face_id, callback) {
         }
     };
 
-
-    var request = http.request(params, function(response) {
-
-        // console.log('STATUS: ' + response.statusCode);
-        // console.log('HEADERS: ' + JSON.stringify(response.headers));
-
-        if( response.statusCode  !=  200 ){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':{}});
-             return;
-        }
-
-        var body = '';
-        response.setEncoding('utf8');
-        
-        response.on('data', function (chunk) {
-             body += chunk;
-        });
-
-        response.on('end', function(){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message':statusText(response.statusCode) , 'data':JSON.parse(body)});
-        });
-
-        response.on('error', function(e){
-             callback({'httpcode':response.statusCode, 'code':response.statusCode , 'message': '' + e , 'data':{} });
-        });
-
-    }); // 
-
-     
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
+ 
     request.on('error', function(e) {
          callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
     });
@@ -1182,8 +969,198 @@ exports.getfaceinfo = function(face_id, callback) {
     request.end(request_body);
 }
 
+/**
+ * @brief detectface
+ * @param imagePath 待检测的路径
+ * @param isbigface 是否大脸模式 ０表示检测所有人脸， 1表示只检测照片最大人脸　适合单人照模式
+ * @param callback 回调函数, 参见Readme 文档
+ */
+exports.fuzzydetect = function(imagePath,　callback) {
 
+    callback = callback || function(ret){console.log(ret)};
 
+    var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
+    var sign  = auth.appSign(expired);
+    var tag = imagePath.substring(0,4);
+    var request_body = '';
+    if (tag == 'http')
+    {
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            url : imagePath,
+        });
+    }
+    else
+    {
+        var data = fs.readFileSync(imagePath).toString('base64');
+        
+        if(data == null) {
+            callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
+            return;
+        };
 
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            image : data.toString('base64'),
+        });
+    }
+    var params = {
+        hostname: conf.API_YOUTU_SERVER,
+        path: '/youtu/imageapi/fuzzydetect',
+        method: 'POST',
+        headers: {
+            'Authorization': sign,
+            'User-Agent'   : conf.USER_AGENT(),
+            'Content-Length': request_body.length,
+            'Content-Type': 'text/json'
+        }
+    };
+    //console.log(request_body);
+    //console.log(params);
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
+        
+    request.on('error', function(e) {
+        callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
+    });
+    
+    // send the request body
+    request.end(request_body);    
+}
 
+/**
+ * @brief detectface
+ * @param imagePath 待检测的路径
+ * @param isbigface 是否大脸模式 ０表示检测所有人脸， 1表示只检测照片最大人脸　适合单人照模式
+ * @param callback 回调函数, 参见Readme 文档
+ */
+exports.fooddetect = function(imagePath,　callback) {
 
+    callback = callback || function(ret){console.log(ret)};
+
+    var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
+    var sign  = auth.appSign(expired);
+    var tag = imagePath.substring(0,4);
+    var request_body = '';
+    if (tag == 'http')
+    {
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            url : imagePath,
+        });
+    }
+    else
+    {
+        var data = fs.readFileSync(imagePath).toString('base64');
+        
+        if(data == null) {
+            callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
+            return;
+        };
+
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            image : data.toString('base64'),
+        });
+    }
+    var params = {
+        hostname: conf.API_YOUTU_SERVER,
+        path: '/youtu/imageapi/fooddetect',
+        method: 'POST',
+        headers: {
+            'Authorization': sign,
+            'User-Agent'   : conf.USER_AGENT(),
+            'Content-Length': request_body.length,
+            'Content-Type': 'text/json'
+        }
+    };
+    //console.log(request_body);
+    //console.log(params);
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
+        
+    request.on('error', function(e) {
+        callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
+    });
+    
+    // send the request body
+    request.end(request_body);    
+}
+
+/**
+ * @brief detectface
+ * @param imagePath 待检测的路径
+ * @param isbigface 是否大脸模式 ０表示检测所有人脸， 1表示只检测照片最大人脸　适合单人照模式
+ * @param callback 回调函数, 参见Readme 文档
+ */
+exports.imagetag = function(imagePath,　callback) {
+
+    callback = callback || function(ret){console.log(ret)};
+
+    var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
+    var sign  = auth.appSign(expired);
+    var tag = imagePath.substring(0,4);
+    var request_body = '';
+    if (tag == 'http')
+    {
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            url : imagePath,
+        });
+    }
+    else
+    {
+        var data = fs.readFileSync(imagePath).toString('base64');
+        
+        if(data == null) {
+            callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
+            return;
+        };
+
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            image : data.toString('base64'),
+        });
+    }
+    var params = {
+        hostname: conf.API_YOUTU_SERVER,
+        path: '/youtu/imageapi/imagetag',
+        method: 'POST',
+        headers: {
+            'Authorization': sign,
+            'User-Agent'   : conf.USER_AGENT(),
+            'Content-Length': request_body.length,
+            'Content-Type': 'text/json'
+        }
+    };
+    //console.log(request_body);
+    //console.log(params);
+    
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
+        
+    request.on('error', function(e) {
+        callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
+    });
+    
+    // send the request body
+    request.end(request_body);    
+}
