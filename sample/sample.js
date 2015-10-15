@@ -3,10 +3,10 @@ var conf  = tencentyoutuyun.conf;
 var youtu = tencentyoutuyun.youtu;
 
 // 设置开发者和应用信息, 请填写你在开放平台
-var appid = '10004859';
-var secretId = 'AKIDh9QwYQJmBjI7Y3wSdbUMqEkbAJjwr3Ts';
-var secretKey = 'jhMXKdVme7r9EW8NIWNbpHE8nZaLu7lP';
-var userid = '100221';
+var appid = '';
+var secretId = '';
+var secretKey = '';
+var userid = '';
 
 conf.setAppInfo(appid, secretId, secretKey, userid, 1)
 
