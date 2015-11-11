@@ -970,9 +970,8 @@ exports.getfaceinfo = function(face_id, callback) {
 }
 
 /**
- * @brief detectface
+ * @brief fuzzydetect
  * @param imagePath 待检测的路径
- * @param isbigface 是否大脸模式 ０表示检测所有人脸， 1表示只检测照片最大人脸　适合单人照模式
  * @param callback 回调函数, 参见Readme 文档
  */
 exports.fuzzydetect = function(imagePath,　callback) {
@@ -1035,9 +1034,8 @@ exports.fuzzydetect = function(imagePath,　callback) {
 }
 
 /**
- * @brief detectface
+ * @brief fooddetect
  * @param imagePath 待检测的路径
- * @param isbigface 是否大脸模式 ０表示检测所有人脸， 1表示只检测照片最大人脸　适合单人照模式
  * @param callback 回调函数, 参见Readme 文档
  */
 exports.fooddetect = function(imagePath,　callback) {
@@ -1100,9 +1098,8 @@ exports.fooddetect = function(imagePath,　callback) {
 }
 
 /**
- * @brief detectface
+ * @brief imagetag
  * @param imagePath 待检测的路径
- * @param isbigface 是否大脸模式 ０表示检测所有人脸， 1表示只检测照片最大人脸　适合单人照模式
  * @param callback 回调函数, 参见Readme 文档
  */
 exports.imagetag = function(imagePath,　callback) {
