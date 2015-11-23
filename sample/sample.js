@@ -11,7 +11,7 @@ var userid = '';
 conf.setAppInfo(appid, secretId, secretKey, userid, 1)
 
 // 人脸检测 测试
-youtu.detectface('a.jpg', function(data){
+youtu.detectface('a.jpg', 0, function(data){
     console.log("detectface:" + JSON.stringify(data));
 });
 
