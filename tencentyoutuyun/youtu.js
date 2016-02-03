@@ -1,7 +1,7 @@
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
-var conv = require('iconv-lite')
+
 
 
 var auth = require('./auth');
@@ -240,6 +240,64 @@ exports.facecompare = function(image_a, image_b, callback) {
             imageB : data_b.toString('base64'),
         });
     }
+    
+    var params = {
+        hostname: conf.API_YOUTU_SERVER,
+        path: '/youtu/api/facecompare',
+        method: 'POST',
+        headers: {
+            'Authorization': sign,
+            'User-Agent'   : conf.USER_AGENT(),
+            'Content-Length': request_body.length,
+            'Content-Type': 'text/json'
+        }                
+    };
+     
+    //console.log(request_body);
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
+       
+    request.on('error', function(e) {
+         callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
+    });
+
+    // send the request body
+    request.end(request_body);
+}
+
+
+/**
+ * @brief facecompare
+ * @param image_file 待比对的A图片路径（本地路径)
+ * @param image_url 待比对的B图片路径（url）
+ * @param callback 回调函数, 参见Readme 文档
+ */
+exports.facecompare_file_url = function(image_file, image_url, callback) {
+
+    callback = callback || function(ret){console.log(ret)};
+
+    var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
+    var sign  = auth.appSign(expired);
+
+    var data_a = fs.readFileSync(image_file).toString('base64');
+    
+    if(data_a == null ) {
+        callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
+        return;
+    };
+
+    var request_body = JSON.stringify({
+        app_id: conf.APPID,
+        imageA : data_a.toString('base64'),
+        urlB   : image_url,
+    });
+
     
     var params = {
         hostname: conf.API_YOUTU_SERVER,

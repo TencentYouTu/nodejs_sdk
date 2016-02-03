@@ -115,6 +115,22 @@ git clone https://github.com/TencentYouTu/nodejs_sdk.git
 - `message` 状态码对应的描述文字
 - `data` 数据对象，参考API文档
 
+#### `youtu.facecompare_file_url(image_file, image_url, callback)`
+
+人脸对比，计算两个Face的相似性以及五官相似度。
+
+- 参数
+	- `image_file` 第一张图片路径
+	- `image_url` 第二张图片url
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
 #### `youtu.faceverify(image_a, person_id, callback)`
 
 人脸验证，给定一个Face和一个Person，返回是否是同一个人的判断以及置信度。
