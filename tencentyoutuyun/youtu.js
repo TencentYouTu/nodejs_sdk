@@ -89,7 +89,12 @@ exports.detectface = function(imagePath,　isbigface, callback) {
     }
     else
     {
-        var data = fs.readFileSync(imagePath).toString('base64');
+        try {
+           var data = fs.readFileSync(imagePath).toString('base64');
+        } catch (e) {
+           callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists', 'data':{}});
+           return;
+        }
         
         if(data == null) {
             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
@@ -159,8 +164,12 @@ exports.faceshape = function(imagePath, isbigface, callback) {
     }
     else
     {
-        var data = fs.readFileSync(imagePath).toString('base64');
-        
+        try {
+           var data = fs.readFileSync(imagePath).toString('base64');
+        } catch (e) {
+           callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists', 'data':{}});
+           return;
+        }
         if(data == null) {
             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
             return;
@@ -226,8 +235,15 @@ exports.facecompare = function(image_a, image_b, callback) {
     }
     else
     {
-        var data_a = fs.readFileSync(image_a).toString('base64');
-        var data_b = fs.readFileSync(image_b).toString('base64');
+        try {
+           var data_a = fs.readFileSync(image_a).toString('base64');
+           var data_b = fs.readFileSync(image_b).toString('base64');
+        } catch (e) {
+           callback({'httpcode':0, 'code':-1, 'message':'file ' + image_a + ' or ' + image_b + ' not exists', 'data':{}});
+           return;
+        }
+
+
         
         if(data_a == null || data_b == null ) {
             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
@@ -285,7 +301,12 @@ exports.facecompare_file_url = function(image_file, image_url, callback) {
     var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
     var sign  = auth.appSign(expired);
 
-    var data_a = fs.readFileSync(image_file).toString('base64');
+    try {
+        var data_a = fs.readFileSync(image_file).toString('base64');
+    } catch (e) {
+        callback({'httpcode':0, 'code':-1, 'message':'file ' + image_file + ' not exists', 'data':{}});
+        return;
+    }
     
     if(data_a == null ) {
         callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
@@ -355,7 +376,12 @@ exports.faceverify = function(imagePath, person_id, callback) {
     }
     else
     {
-        var data = fs.readFileSync(imagePath).toString('base64');
+        try {
+            var data = fs.readFileSync(imagePath).toString('base64');
+        } catch (e) {
+            callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists', 'data':{}});
+            return;
+        }
         
         if(data == null) {
             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
@@ -427,7 +453,13 @@ exports.faceidentify= function(imagePath, group_id, callback) {
     }
     else
     {
-        var data = fs.readFileSync(imagePath).toString('base64');
+        try {
+            var data = fs.readFileSync(imagePath).toString('base64');
+        } catch (e) {
+            callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists', 'data':{}});
+            return;
+        }
+        
         
         if(data == null) {
             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
@@ -502,7 +534,13 @@ exports.newperson= function(imagePath, person_id, person_name, group_ids, person
     }
     else
     {
-        var data = fs.readFileSync(imagePath).toString('base64');
+        try {
+            var data = fs.readFileSync(imagePath).toString('base64');
+        } catch (e) {
+            callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists', 'data':{}});
+            return;
+        }
+        
         
         if(data == null) {
             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
@@ -633,8 +671,14 @@ exports.delperson= function(person_id, callback) {
     
         for( var idx in images)
         {
-            var data =fs.readFileSync(images[idx]);
-            if(!data) {
+            try {
+                var data =fs.readFileSync(images[idx]);
+            } catch (e) {
+                callback({'httpcode':0, 'code':-1, 'message':'file ' + images[idx] + ' not exists', 'data':{}});
+                return;
+            }
+            
+            if(data == null) {
                 callback({'httpcode':0, 'code':-1, 'message': images[idx] + ": read failed!", 'data':{}});
                 return;    
             }
@@ -1049,7 +1093,13 @@ exports.fuzzydetect = function(imagePath,　callback) {
     }
     else
     {
-        var data = fs.readFileSync(imagePath).toString('base64');
+        try {
+             var data = fs.readFileSync(imagePath).toString('base64');
+        } catch (e) {
+             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists', 'data':{}});
+             return;
+        }
+        
         
         if(data == null) {
             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
@@ -1113,8 +1163,13 @@ exports.fooddetect = function(imagePath,　callback) {
     }
     else
     {
-        var data = fs.readFileSync(imagePath).toString('base64');
         
+        try {
+             var data = fs.readFileSync(imagePath).toString('base64');
+        } catch (e) {
+             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists', 'data':{}});
+             return;
+        }
         if(data == null) {
             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
             return;
@@ -1177,7 +1232,12 @@ exports.imagetag = function(imagePath,　callback) {
     }
     else
     {
-        var data = fs.readFileSync(imagePath).toString('base64');
+        try {
+             var data = fs.readFileSync(imagePath).toString('base64');
+        } catch (e) {
+             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists', 'data':{}});
+             return;
+        }
         
         if(data == null) {
             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
@@ -1219,3 +1279,222 @@ exports.imagetag = function(imagePath,　callback) {
     // send the request body
     request.end(request_body);    
 }
+
+/**
+ * @brief imageporn
+ * @param imagePath 待检测的路径
+ * @param callback 回调函数, 参见Readme 文档
+ */
+exports.imageporn = function(imagePath,　callback) {
+
+    callback = callback || function(ret){console.log(ret)};
+
+    var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
+    var sign  = auth.appSign(expired);
+    var tag = imagePath.substring(0,4);
+    var request_body = '';
+    if (tag == 'http')
+    {
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            url : imagePath,
+        });
+    }
+    else
+    {
+        try {
+             var data = fs.readFileSync(imagePath).toString('base64');
+        } catch (e) {
+             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists', 'data':{}});
+             return;
+        }
+        if(data == null) {
+            callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
+            return;
+        };
+
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            image : data.toString('base64'),
+        });
+    }
+    var params = {
+        hostname: conf.API_YOUTU_SERVER,
+        path: '/youtu/imageapi/imageporn',
+        method: 'POST',
+        headers: {
+            'Authorization': sign,
+            'User-Agent'   : conf.USER_AGENT(),
+            'Content-Length': request_body.length,
+            'Content-Type': 'text/json'
+        }
+    };
+    //console.log(request_body);
+    //console.log(params);
+    
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
+        
+    request.on('error', function(e) {
+        callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
+    });
+    
+    // send the request body
+    request.end(request_body);    
+}
+
+
+/**
+ * @brief imageporn
+ * @param imagePath 待检测的路径
+ * @param cardType 0 代表输入图像是身份证正面， 1代表输入是身份证反面
+ * @param callback 回调函数, 参见Readme 文档
+ */
+exports.idcardocr = function(imagePath,　cardType, callback) {
+    
+    callback = callback || function(ret){console.log(ret)};
+
+    var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
+    var sign  = auth.appSign(expired);
+    var tag = imagePath.substring(0,4);
+    var request_body = '';
+    if (tag == 'http')
+    {
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            card_type: cardType,
+            url : imagePath,
+        });
+    }
+    else
+    {
+        try {
+             var data = fs.readFileSync(imagePath).toString('base64');
+        } catch (e) {
+             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists', 'data':{}});
+             return;
+        }
+        if(data == null) {
+            callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
+            return;
+        };
+
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            card_type: cardType,
+            image : data.toString('base64'),
+        });
+    }
+    var params = {
+        hostname: conf.API_YOUTU_SERVER,
+        path: '/youtu/ocrapi/idcardocr',
+        method: 'POST',
+        headers: {
+            'Authorization': sign,
+            'User-Agent'   : conf.USER_AGENT(),
+            'Content-Length': request_body.length,
+            'Content-Type': 'text/json'
+        }
+    };
+    //console.log(request_body);
+    //console.log(params);
+    
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
+        
+    request.on('error', function(e) {
+        callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
+    });
+    
+    // send the request body
+    request.end(request_body); 
+}
+
+/**
+ * @brief namecardocr
+ * @param imagePath 待检测的路径
+ * @param retImage  false 代表不需要返回识别后图像， true 代表需要返回识别后图像
+ * @param callback 回调函数, 参见Readme 文档
+ */
+exports.namecardocr = function(imagePath,　retImage, callback) {
+    
+    callback = callback || function(ret){console.log(ret)};
+
+    var expired = parseInt(Date.now() / 1000) + EXPIRED_SECONDS;
+    var sign  = auth.appSign(expired);
+    var tag = imagePath.substring(0,4);
+    var request_body = '';
+    if (tag == 'http')
+    {
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            retimage: retImage,
+            url : imagePath,
+        });
+    }
+    else
+    {
+        try {
+             var data = fs.readFileSync(imagePath).toString('base64');
+        } catch (e) {
+             callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists', 'data':{}});
+             return;
+        }
+        
+        if(data == null) {
+            callback({'httpcode':0, 'code':-1, 'message':'file ' + imagePath + ' not exists or params error', 'data':{}});
+            return;
+        };
+
+        request_body = JSON.stringify({
+            app_id: conf.APPID,
+            retimage: retImage,
+            image : data.toString('base64'),
+        });
+    }
+    var params = {
+        //hostname: conf.API_YOUTU_SERVER,
+        host: '101.226.76.164',
+	port: 18082,
+        path:'/youtu/ocrapi/namecardocr',
+        method: 'POST',
+        headers: {
+            'Authorization': sign,
+            'User-Agent'   : conf.USER_AGENT(),
+            'Content-Length': request_body.length,
+            'Content-Type': 'text/json'
+        }
+    };
+    //console.log(request_body);
+    //console.log(params);
+    
+    var request = null;
+    if (conf.API_DOMAIN == 0)
+    {
+        request = getrequest(http, params, callback);
+    } 
+    else {
+        request = getrequest(https, params, callback);
+    } 
+        
+    request.on('error', function(e) {
+        callback({'httpcode': 0, 'code': 0, 'message':e.message, 'data': {}});
+    });
+    
+    // send the request body
+    request.end(request_body); 
+}
+
+
