@@ -325,6 +325,100 @@ git clone https://github.com/TencentYouTu/nodejs_sdk.git
 - `message` 状态码对应的描述文字
 - `data` 数据对象，参考API文档
 
+### `youtu.fuzzydetect(imagePath,　callback)`
+
+模糊检测
+
+- 参数
+	- `imagePath` 图片路径（url或本地路径）
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
+### `youtu.fooddetect(imagePath,　callback)`
+
+检测食物
+
+- 参数
+	- `imagePath` 图片路径（url或本地路径）
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
+
+### `youtu.imagetag(imagePath,　callback)`
+
+图片分类
+
+- 参数
+	- `imagePath` 图片路径（url或本地路径）
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
+
+### `youtu.imageporn(imagePath,　callback)`
+
+色情图像检测
+
+- 参数
+	- `imagePath` 图片路径（url或本地路径）
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
+### `youtu.idcardocr(imagePath,　cardType, callback)`
+
+身份证OCR识别
+
+- 参数
+	- `imagePath` 图片路径（url或本地路径）
+	- `cardType` 0 代表输入图像是身份证正面， 1代表输入是身份证反面
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
+### `youtu.namecardocr(imagePath,　retImage, callback)`
+
+名片ocr识别
+
+- 参数
+	- `imagePath` 图片路径（url或本地路径）
+	- `retImage` false 代表不需要返回识别后图像， true代表需要返回识别后图像
+	- `callback(data)` 回调函数
+
+其中回调函数`callback`的参数`data`是一个对象，结构如下：
+
+- `httpcode` HTTP状态码
+- `code` 状态码，目前和`httpcode`相同
+- `message` 状态码对应的描述文字
+- `data` 数据对象，参考API文档
+
 
 
 ## 致谢
